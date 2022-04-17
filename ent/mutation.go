@@ -37,7 +37,7 @@ type PersonalAccessTokenMutation struct {
 	id            *int
 	name          *string
 	token         *string
-	abilities     *string
+	abilities     *[]string
 	expiration_at *time.Time
 	last_used_at  *time.Time
 	created_at    *time.Time
@@ -184,6 +184,42 @@ func (m *PersonalAccessTokenMutation) ResetName() {
 	m.name = nil
 }
 
+// SetUserID sets the "user_id" field.
+func (m *PersonalAccessTokenMutation) SetUserID(i int) {
+	m.user = &i
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *PersonalAccessTokenMutation) UserID() (r int, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the PersonalAccessToken entity.
+// If the PersonalAccessToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PersonalAccessTokenMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *PersonalAccessTokenMutation) ResetUserID() {
+	m.user = nil
+}
+
 // SetToken sets the "token" field.
 func (m *PersonalAccessTokenMutation) SetToken(s string) {
 	m.token = &s
@@ -221,12 +257,12 @@ func (m *PersonalAccessTokenMutation) ResetToken() {
 }
 
 // SetAbilities sets the "abilities" field.
-func (m *PersonalAccessTokenMutation) SetAbilities(s string) {
+func (m *PersonalAccessTokenMutation) SetAbilities(s []string) {
 	m.abilities = &s
 }
 
 // Abilities returns the value of the "abilities" field in the mutation.
-func (m *PersonalAccessTokenMutation) Abilities() (r string, exists bool) {
+func (m *PersonalAccessTokenMutation) Abilities() (r []string, exists bool) {
 	v := m.abilities
 	if v == nil {
 		return
@@ -237,7 +273,7 @@ func (m *PersonalAccessTokenMutation) Abilities() (r string, exists bool) {
 // OldAbilities returns the old "abilities" field's value of the PersonalAccessToken entity.
 // If the PersonalAccessToken object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PersonalAccessTokenMutation) OldAbilities(ctx context.Context) (v *string, err error) {
+func (m *PersonalAccessTokenMutation) OldAbilities(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAbilities is only allowed on UpdateOne operations")
 	}
@@ -426,11 +462,6 @@ func (m *PersonalAccessTokenMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetUserID sets the "user" edge to the User entity by id.
-func (m *PersonalAccessTokenMutation) SetUserID(id int) {
-	m.user = &id
-}
-
 // ClearUser clears the "user" edge to the User entity.
 func (m *PersonalAccessTokenMutation) ClearUser() {
 	m.cleareduser = true
@@ -439,14 +470,6 @@ func (m *PersonalAccessTokenMutation) ClearUser() {
 // UserCleared reports if the "user" edge to the User entity was cleared.
 func (m *PersonalAccessTokenMutation) UserCleared() bool {
 	return m.cleareduser
-}
-
-// UserID returns the "user" edge ID in the mutation.
-func (m *PersonalAccessTokenMutation) UserID() (id int, exists bool) {
-	if m.user != nil {
-		return *m.user, true
-	}
-	return
 }
 
 // UserIDs returns the "user" edge IDs in the mutation.
@@ -484,9 +507,12 @@ func (m *PersonalAccessTokenMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PersonalAccessTokenMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, personalaccesstoken.FieldName)
+	}
+	if m.user != nil {
+		fields = append(fields, personalaccesstoken.FieldUserID)
 	}
 	if m.token != nil {
 		fields = append(fields, personalaccesstoken.FieldToken)
@@ -516,6 +542,8 @@ func (m *PersonalAccessTokenMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case personalaccesstoken.FieldName:
 		return m.Name()
+	case personalaccesstoken.FieldUserID:
+		return m.UserID()
 	case personalaccesstoken.FieldToken:
 		return m.Token()
 	case personalaccesstoken.FieldAbilities:
@@ -539,6 +567,8 @@ func (m *PersonalAccessTokenMutation) OldField(ctx context.Context, name string)
 	switch name {
 	case personalaccesstoken.FieldName:
 		return m.OldName(ctx)
+	case personalaccesstoken.FieldUserID:
+		return m.OldUserID(ctx)
 	case personalaccesstoken.FieldToken:
 		return m.OldToken(ctx)
 	case personalaccesstoken.FieldAbilities:
@@ -567,6 +597,13 @@ func (m *PersonalAccessTokenMutation) SetField(name string, value ent.Value) err
 		}
 		m.SetName(v)
 		return nil
+	case personalaccesstoken.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
 	case personalaccesstoken.FieldToken:
 		v, ok := value.(string)
 		if !ok {
@@ -575,7 +612,7 @@ func (m *PersonalAccessTokenMutation) SetField(name string, value ent.Value) err
 		m.SetToken(v)
 		return nil
 	case personalaccesstoken.FieldAbilities:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -616,13 +653,16 @@ func (m *PersonalAccessTokenMutation) SetField(name string, value ent.Value) err
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *PersonalAccessTokenMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *PersonalAccessTokenMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -675,6 +715,9 @@ func (m *PersonalAccessTokenMutation) ResetField(name string) error {
 	switch name {
 	case personalaccesstoken.FieldName:
 		m.ResetName()
+		return nil
+	case personalaccesstoken.FieldUserID:
+		m.ResetUserID()
 		return nil
 	case personalaccesstoken.FieldToken:
 		m.ResetToken()

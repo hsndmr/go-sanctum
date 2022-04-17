@@ -2,22 +2,24 @@ package repositories
 
 import (
 	"context"
-	"strings"
 	"testing"
+
+	"github.com/hsndmr/go-sanctum/app"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestCreatePersonalAccessToken tests the creation of a personal access token
 func TestCreatePersonalAccessToken(t *testing.T) {
 	uf := &UserFactory{}
 
-	user := uf.Create()
+	user, _ := uf.Create()
 
 	patr := &PersonalAccessTokenRepository{}
 
 	t.Run("it should create personal access token", func(t *testing.T) {
 		token, err :=  patr.Create(&CreatePersonalAccessTokenDto{
 			User: user,
-		}, context.Background())
+		}, app.C.DBClient, context.Background())
 
 		if err != nil {
 			t.Errorf("failed creating personal access token: %s", err.Error())
@@ -31,13 +33,11 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 	t.Run("it should create personal access token with abilities", func(t *testing.T) {
 		abilities := []string{"user:update", "user:delete"}
 		
-		token, _ :=  patr.Create(&CreatePersonalAccessTokenDto{
+		 token, _ := patr.Create(&CreatePersonalAccessTokenDto{
 			User: user,
 			Abilities: abilities,
-		}, context.Background())
-
-		if *token.Abilities != strings.Join(abilities, ",") {
-			t.Errorf("failed creating personal access token")
-		}
+		}, app.C.DBClient, context.Background())
+		
+		assert.Equal(t, token.Abilities, abilities, "the abilities should be equal")
 	})
 }

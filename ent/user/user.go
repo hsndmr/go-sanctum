@@ -31,7 +31,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "personalaccesstoken" package.
 	PersonalAccessTokensInverseTable = "personal_access_tokens"
 	// PersonalAccessTokensColumn is the table column denoting the personal_access_tokens relation/edge.
-	PersonalAccessTokensColumn = "user_personal_access_tokens"
+	PersonalAccessTokensColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.

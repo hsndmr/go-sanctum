@@ -18,10 +18,10 @@ type PersonalAccessToken struct {
 func (PersonalAccessToken) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
+		field.Int("user_id"),
 		field.String("token").MaxLen(64),
-		field.Text("abilities").
-			Optional().
-			Nillable(),
+		field.JSON("abilities", []string{}).
+			Optional(),
 		field.Time("expiration_at"),
 		field.Time("last_used_at").
 			Optional().
@@ -39,8 +39,10 @@ func (PersonalAccessToken) Fields() []ent.Field {
 func (PersonalAccessToken) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).
-		Ref("personal_access_tokens").
-		Unique(),
+				Ref("personal_access_tokens").
+				Unique().
+				Required().
+				Field("user_id"),
 	}
 }
 
@@ -48,5 +50,5 @@ func(PersonalAccessToken) Indexes() []ent.Index {
 	return []ent.Index{
 		// non-unique index.
 		index.Fields("token"),
-}
+	}
 }

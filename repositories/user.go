@@ -8,6 +8,10 @@ import (
 	"github.com/hsndmr/go-sanctum/pkg/crypto"
 )
 
+type UserRepositoryI interface{
+	Create(dto *CreateUserDto, db *connection.DBClient, ctx context.Context) (*ent.User, error)
+}
+
 type CreateUserDto struct {
 	Name string
 	Email string
@@ -19,8 +23,8 @@ type UserRepository struct {
 }
 
 // Create creates a user and returns the user.
-func (r *UserRepository) Create(dto *CreateUserDto, ctx context.Context) (*ent.User, error) {
-	return connection.Client.User.
+func (r *UserRepository) Create(dto *CreateUserDto, db *connection.DBClient, ctx context.Context) (*ent.User, error) {
+	return db.Client.User.
 						Create().
 						SetEmail(dto.Email).
 						SetPassword(crypto.HashPassword(dto.Password)).

@@ -27,7 +27,6 @@ type PersonalAccessTokenQuery struct {
 	predicates []predicate.PersonalAccessToken
 	// eager-loading edges.
 	withUser *UserQuery
-	withFKs  bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -350,18 +349,11 @@ func (patq *PersonalAccessTokenQuery) prepareQuery(ctx context.Context) error {
 func (patq *PersonalAccessTokenQuery) sqlAll(ctx context.Context) ([]*PersonalAccessToken, error) {
 	var (
 		nodes       = []*PersonalAccessToken{}
-		withFKs     = patq.withFKs
 		_spec       = patq.querySpec()
 		loadedTypes = [1]bool{
 			patq.withUser != nil,
 		}
 	)
-	if patq.withUser != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, personalaccesstoken.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &PersonalAccessToken{config: patq.config}
 		nodes = append(nodes, node)
@@ -386,10 +378,7 @@ func (patq *PersonalAccessTokenQuery) sqlAll(ctx context.Context) ([]*PersonalAc
 		ids := make([]int, 0, len(nodes))
 		nodeids := make(map[int][]*PersonalAccessToken)
 		for i := range nodes {
-			if nodes[i].user_personal_access_tokens == nil {
-				continue
-			}
-			fk := *nodes[i].user_personal_access_tokens
+			fk := nodes[i].UserID
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
@@ -403,7 +392,7 @@ func (patq *PersonalAccessTokenQuery) sqlAll(ctx context.Context) ([]*PersonalAc
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "user_personal_access_tokens" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
 				nodes[i].Edges.User = n

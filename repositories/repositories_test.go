@@ -1,18 +1,16 @@
 package repositories
 
 import (
-	"context"
 	"os"
 	"testing"
 
 	"github.com/hsndmr/go-sanctum/app"
-	"github.com/hsndmr/go-sanctum/pkg/connection"
 )
 
 
 func TestMain(m *testing.M) {
-	app.Init(context.Background())
+	app.Init()
 	exitVal := m.Run()
-	connection.Close()
+	app.C.DBClient.Client.Close()
 	os.Exit(exitVal)
 }

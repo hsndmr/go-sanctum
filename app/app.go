@@ -2,23 +2,27 @@ package app
 
 import (
 	"context"
-	"log"
 
 	"github.com/hsndmr/go-sanctum/pkg/config"
 	"github.com/hsndmr/go-sanctum/pkg/connection"
 )
 
-func Init(ctx context.Context) {
-	config.App.Init()
-	connection.Connect()
 
-	if config.App.Env == "local" {
-		CreateSchema()
-	}
+type Container struct {
+	Config *config.Config
+	DBClient *connection.DBClient
 }
 
-func CreateSchema() {
-	if err := connection.Client.Schema.Create(context.Background()); err != nil {
-		log.Fatalf("Database Migration Error: %v", err)
-	}
+var C *Container
+
+// Init initializes the configuration and database connection
+func Init() {
+	C = CreateContainer(context.Background())
+}
+
+func CreateContainer(ctx context.Context) *Container {
+	container := &Container{}
+	container.Config, _ = config.Init()
+	container.DBClient, _ = connection.CreateClient(container.Config)
+	return container
 }

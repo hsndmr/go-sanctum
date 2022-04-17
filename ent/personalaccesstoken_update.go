@@ -35,6 +35,12 @@ func (patu *PersonalAccessTokenUpdate) SetName(s string) *PersonalAccessTokenUpd
 	return patu
 }
 
+// SetUserID sets the "user_id" field.
+func (patu *PersonalAccessTokenUpdate) SetUserID(i int) *PersonalAccessTokenUpdate {
+	patu.mutation.SetUserID(i)
+	return patu
+}
+
 // SetToken sets the "token" field.
 func (patu *PersonalAccessTokenUpdate) SetToken(s string) *PersonalAccessTokenUpdate {
 	patu.mutation.SetToken(s)
@@ -42,16 +48,8 @@ func (patu *PersonalAccessTokenUpdate) SetToken(s string) *PersonalAccessTokenUp
 }
 
 // SetAbilities sets the "abilities" field.
-func (patu *PersonalAccessTokenUpdate) SetAbilities(s string) *PersonalAccessTokenUpdate {
+func (patu *PersonalAccessTokenUpdate) SetAbilities(s []string) *PersonalAccessTokenUpdate {
 	patu.mutation.SetAbilities(s)
-	return patu
-}
-
-// SetNillableAbilities sets the "abilities" field if the given value is not nil.
-func (patu *PersonalAccessTokenUpdate) SetNillableAbilities(s *string) *PersonalAccessTokenUpdate {
-	if s != nil {
-		patu.SetAbilities(*s)
-	}
 	return patu
 }
 
@@ -90,20 +88,6 @@ func (patu *PersonalAccessTokenUpdate) ClearLastUsedAt() *PersonalAccessTokenUpd
 // SetUpdatedAt sets the "updated_at" field.
 func (patu *PersonalAccessTokenUpdate) SetUpdatedAt(t time.Time) *PersonalAccessTokenUpdate {
 	patu.mutation.SetUpdatedAt(t)
-	return patu
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (patu *PersonalAccessTokenUpdate) SetUserID(id int) *PersonalAccessTokenUpdate {
-	patu.mutation.SetUserID(id)
-	return patu
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (patu *PersonalAccessTokenUpdate) SetNillableUserID(id *int) *PersonalAccessTokenUpdate {
-	if id != nil {
-		patu = patu.SetUserID(*id)
-	}
 	return patu
 }
 
@@ -199,6 +183,9 @@ func (patu *PersonalAccessTokenUpdate) check() error {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "PersonalAccessToken.token": %w`, err)}
 		}
 	}
+	if _, ok := patu.mutation.UserID(); patu.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "PersonalAccessToken.user"`)
+	}
 	return nil
 }
 
@@ -236,14 +223,14 @@ func (patu *PersonalAccessTokenUpdate) sqlSave(ctx context.Context) (n int, err 
 	}
 	if value, ok := patu.mutation.Abilities(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Value:  value,
 			Column: personalaccesstoken.FieldAbilities,
 		})
 	}
 	if patu.mutation.AbilitiesCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Column: personalaccesstoken.FieldAbilities,
 		})
 	}
@@ -334,6 +321,12 @@ func (patuo *PersonalAccessTokenUpdateOne) SetName(s string) *PersonalAccessToke
 	return patuo
 }
 
+// SetUserID sets the "user_id" field.
+func (patuo *PersonalAccessTokenUpdateOne) SetUserID(i int) *PersonalAccessTokenUpdateOne {
+	patuo.mutation.SetUserID(i)
+	return patuo
+}
+
 // SetToken sets the "token" field.
 func (patuo *PersonalAccessTokenUpdateOne) SetToken(s string) *PersonalAccessTokenUpdateOne {
 	patuo.mutation.SetToken(s)
@@ -341,16 +334,8 @@ func (patuo *PersonalAccessTokenUpdateOne) SetToken(s string) *PersonalAccessTok
 }
 
 // SetAbilities sets the "abilities" field.
-func (patuo *PersonalAccessTokenUpdateOne) SetAbilities(s string) *PersonalAccessTokenUpdateOne {
+func (patuo *PersonalAccessTokenUpdateOne) SetAbilities(s []string) *PersonalAccessTokenUpdateOne {
 	patuo.mutation.SetAbilities(s)
-	return patuo
-}
-
-// SetNillableAbilities sets the "abilities" field if the given value is not nil.
-func (patuo *PersonalAccessTokenUpdateOne) SetNillableAbilities(s *string) *PersonalAccessTokenUpdateOne {
-	if s != nil {
-		patuo.SetAbilities(*s)
-	}
 	return patuo
 }
 
@@ -389,20 +374,6 @@ func (patuo *PersonalAccessTokenUpdateOne) ClearLastUsedAt() *PersonalAccessToke
 // SetUpdatedAt sets the "updated_at" field.
 func (patuo *PersonalAccessTokenUpdateOne) SetUpdatedAt(t time.Time) *PersonalAccessTokenUpdateOne {
 	patuo.mutation.SetUpdatedAt(t)
-	return patuo
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (patuo *PersonalAccessTokenUpdateOne) SetUserID(id int) *PersonalAccessTokenUpdateOne {
-	patuo.mutation.SetUserID(id)
-	return patuo
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (patuo *PersonalAccessTokenUpdateOne) SetNillableUserID(id *int) *PersonalAccessTokenUpdateOne {
-	if id != nil {
-		patuo = patuo.SetUserID(*id)
-	}
 	return patuo
 }
 
@@ -505,6 +476,9 @@ func (patuo *PersonalAccessTokenUpdateOne) check() error {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "PersonalAccessToken.token": %w`, err)}
 		}
 	}
+	if _, ok := patuo.mutation.UserID(); patuo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "PersonalAccessToken.user"`)
+	}
 	return nil
 }
 
@@ -559,14 +533,14 @@ func (patuo *PersonalAccessTokenUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	if value, ok := patuo.mutation.Abilities(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Value:  value,
 			Column: personalaccesstoken.FieldAbilities,
 		})
 	}
 	if patuo.mutation.AbilitiesCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Column: personalaccesstoken.FieldAbilities,
 		})
 	}

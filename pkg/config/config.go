@@ -3,46 +3,38 @@ package config
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	EnvDepth int
-	Database Database
-	Env string
+	Database *Database
+	EnvType string
 }
 
-// InitEnv initializes the env file
-func (c *Config) initEnv() {
-	env, err := findEnv()
+
+// Init return the config
+func Init() (*Config, error) {
+	env, err := FindEnv()
 	if err != nil {
-		log.Fatal("Not found .env file")
+		return nil, err
 	}
 
 	err = godotenv.Load(env)
 	if err != nil {
-    log.Fatal("Error loading .env file")
+    return nil, err
   }
+
+	config := &Config{}
+
+	config.Database = databaseSetting()
+
+	config.EnvType = os.Getenv("APP_ENV")
+
+	return config, nil
 }
 
-func (c *Config) initApp() {
-	c.initEnv()
-	c.Env = os.Getenv("APP_ENV")
-}
-
-// Init initializes the config
-func (c *Config) Init() {
-	c.initApp()
-	c.initDatabaseSetting()
-}
-
-// App is the global config
-var App = &Config{
-	EnvDepth: 20,
-}
 
 // Database is the database config
 type Database struct {
@@ -53,17 +45,16 @@ type Database struct {
 	Password string
 }
 
-// DatabaseConfig is the database config
-var DatabaseConfig = &Database{}
 
-// initDatabaseSetting initializes the database setting
-func (c *Config) initDatabaseSetting() {
-	DatabaseConfig.Connection = os.Getenv("DB_CONNECTION")
-	DatabaseConfig.Host = os.Getenv("DB_HOST")
-	DatabaseConfig.Name = os.Getenv("DB_DATABASE")
-	DatabaseConfig.User = os.Getenv("DB_USERNAME")
-	DatabaseConfig.Password = os.Getenv("DB_PASSWORD")	
-	App.Database = *DatabaseConfig
+// databaseSetting returns the database config
+func databaseSetting() *Database {
+	databaseConfig := &Database{}
+	databaseConfig.Connection = os.Getenv("DB_CONNECTION")
+	databaseConfig.Host = os.Getenv("DB_HOST")
+	databaseConfig.Name = os.Getenv("DB_DATABASE")
+	databaseConfig.User = os.Getenv("DB_USERNAME")
+	databaseConfig.Password = os.Getenv("DB_PASSWORD")	
+	return databaseConfig
 }
 
 // isEnvExists checks if the file exists
@@ -78,7 +69,7 @@ func isRunningOnTest() bool {
 }
  
 // findEnvFile finds the env file
-func findEnv() (string, error) {
+func FindEnv() (string, error) {
 	file := ".env"
 
 	if isRunningOnTest() {
@@ -91,7 +82,7 @@ func findEnv() (string, error) {
 
 	dept := "../"
 
-	for i := 1; i <= App.EnvDepth; i++ {
+	for i := 1; i <= 10; i++ {
 		if(isExistFile(dept+file)) {
 			return dept+file, nil
 		}

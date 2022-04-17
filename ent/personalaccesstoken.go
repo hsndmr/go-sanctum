@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -19,10 +20,12 @@ type PersonalAccessToken struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
 	// Token holds the value of the "token" field.
 	Token string `json:"token,omitempty"`
 	// Abilities holds the value of the "abilities" field.
-	Abilities *string `json:"abilities,omitempty"`
+	Abilities []string `json:"abilities,omitempty"`
 	// ExpirationAt holds the value of the "expiration_at" field.
 	ExpirationAt time.Time `json:"expiration_at,omitempty"`
 	// LastUsedAt holds the value of the "last_used_at" field.
@@ -33,8 +36,7 @@ type PersonalAccessToken struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PersonalAccessTokenQuery when eager-loading is set.
-	Edges                       PersonalAccessTokenEdges `json:"edges"`
-	user_personal_access_tokens *int
+	Edges PersonalAccessTokenEdges `json:"edges"`
 }
 
 // PersonalAccessTokenEdges holds the relations/edges for other nodes in the graph.
@@ -65,14 +67,14 @@ func (*PersonalAccessToken) scanValues(columns []string) ([]interface{}, error) 
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case personalaccesstoken.FieldID:
+		case personalaccesstoken.FieldAbilities:
+			values[i] = new([]byte)
+		case personalaccesstoken.FieldID, personalaccesstoken.FieldUserID:
 			values[i] = new(sql.NullInt64)
-		case personalaccesstoken.FieldName, personalaccesstoken.FieldToken, personalaccesstoken.FieldAbilities:
+		case personalaccesstoken.FieldName, personalaccesstoken.FieldToken:
 			values[i] = new(sql.NullString)
 		case personalaccesstoken.FieldExpirationAt, personalaccesstoken.FieldLastUsedAt, personalaccesstoken.FieldCreatedAt, personalaccesstoken.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case personalaccesstoken.ForeignKeys[0]: // user_personal_access_tokens
-			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type PersonalAccessToken", columns[i])
 		}
@@ -100,6 +102,12 @@ func (pat *PersonalAccessToken) assignValues(columns []string, values []interfac
 			} else if value.Valid {
 				pat.Name = value.String
 			}
+		case personalaccesstoken.FieldUserID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value.Valid {
+				pat.UserID = int(value.Int64)
+			}
 		case personalaccesstoken.FieldToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
@@ -107,11 +115,12 @@ func (pat *PersonalAccessToken) assignValues(columns []string, values []interfac
 				pat.Token = value.String
 			}
 		case personalaccesstoken.FieldAbilities:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field abilities", values[i])
-			} else if value.Valid {
-				pat.Abilities = new(string)
-				*pat.Abilities = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &pat.Abilities); err != nil {
+					return fmt.Errorf("unmarshal field abilities: %w", err)
+				}
 			}
 		case personalaccesstoken.FieldExpirationAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -137,13 +146,6 @@ func (pat *PersonalAccessToken) assignValues(columns []string, values []interfac
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				pat.UpdatedAt = value.Time
-			}
-		case personalaccesstoken.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_personal_access_tokens", value)
-			} else if value.Valid {
-				pat.user_personal_access_tokens = new(int)
-				*pat.user_personal_access_tokens = int(value.Int64)
 			}
 		}
 	}
@@ -180,12 +182,12 @@ func (pat *PersonalAccessToken) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", pat.ID))
 	builder.WriteString(", name=")
 	builder.WriteString(pat.Name)
+	builder.WriteString(", user_id=")
+	builder.WriteString(fmt.Sprintf("%v", pat.UserID))
 	builder.WriteString(", token=")
 	builder.WriteString(pat.Token)
-	if v := pat.Abilities; v != nil {
-		builder.WriteString(", abilities=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString(", abilities=")
+	builder.WriteString(fmt.Sprintf("%v", pat.Abilities))
 	builder.WriteString(", expiration_at=")
 	builder.WriteString(pat.ExpirationAt.Format(time.ANSIC))
 	if v := pat.LastUsedAt; v != nil {

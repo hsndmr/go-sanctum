@@ -5,10 +5,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"context"
-
 	"github.com/hsndmr/go-sanctum/app"
-	"github.com/hsndmr/go-sanctum/pkg/connection"
 	"github.com/spf13/cobra"
 )
 
@@ -23,8 +20,8 @@ var migrateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(migrateCmd)
 
-	app.Init(context.Background())
-	defer connection.Client.Close()
+	app.Init()
+	defer app.C.DBClient.Close()
 
 	// Here you will define your flags and configuration settings.
 

@@ -1,4 +1,2 @@
 schema:
-	go generate ./ent
-migrate: 
-	go run ./cobra/cobra.go migrate
+	go generate ./ent && go run ./cobra/cobra.go migrate

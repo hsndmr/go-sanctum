@@ -17,15 +17,15 @@ func init() {
 	personalaccesstokenFields := schema.PersonalAccessToken{}.Fields()
 	_ = personalaccesstokenFields
 	// personalaccesstokenDescToken is the schema descriptor for token field.
-	personalaccesstokenDescToken := personalaccesstokenFields[1].Descriptor()
+	personalaccesstokenDescToken := personalaccesstokenFields[2].Descriptor()
 	// personalaccesstoken.TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	personalaccesstoken.TokenValidator = personalaccesstokenDescToken.Validators[0].(func(string) error)
 	// personalaccesstokenDescCreatedAt is the schema descriptor for created_at field.
-	personalaccesstokenDescCreatedAt := personalaccesstokenFields[5].Descriptor()
+	personalaccesstokenDescCreatedAt := personalaccesstokenFields[6].Descriptor()
 	// personalaccesstoken.DefaultCreatedAt holds the default value on creation for the created_at field.
 	personalaccesstoken.DefaultCreatedAt = personalaccesstokenDescCreatedAt.Default.(func() time.Time)
 	// personalaccesstokenDescUpdatedAt is the schema descriptor for updated_at field.
-	personalaccesstokenDescUpdatedAt := personalaccesstokenFields[6].Descriptor()
+	personalaccesstokenDescUpdatedAt := personalaccesstokenFields[7].Descriptor()
 	// personalaccesstoken.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	personalaccesstoken.DefaultUpdatedAt = personalaccesstokenDescUpdatedAt.Default.(func() time.Time)
 	// personalaccesstoken.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

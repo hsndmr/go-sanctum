@@ -100,17 +100,17 @@ func Name(v string) predicate.PersonalAccessToken {
 	})
 }
 
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.PersonalAccessToken {
+	return predicate.PersonalAccessToken(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUserID), v))
+	})
+}
+
 // Token applies equality check predicate on the "token" field. It's identical to TokenEQ.
 func Token(v string) predicate.PersonalAccessToken {
 	return predicate.PersonalAccessToken(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldToken), v))
-	})
-}
-
-// Abilities applies equality check predicate on the "abilities" field. It's identical to AbilitiesEQ.
-func Abilities(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldAbilities), v))
 	})
 }
 
@@ -253,6 +253,54 @@ func NameContainsFold(v string) predicate.PersonalAccessToken {
 	})
 }
 
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.PersonalAccessToken {
+	return predicate.PersonalAccessToken(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.PersonalAccessToken {
+	return predicate.PersonalAccessToken(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldUserID), v))
+	})
+}
+
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.PersonalAccessToken {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PersonalAccessToken(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldUserID), v...))
+	})
+}
+
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.PersonalAccessToken {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.PersonalAccessToken(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldUserID), v...))
+	})
+}
+
 // TokenEQ applies the EQ predicate on the "token" field.
 func TokenEQ(v string) predicate.PersonalAccessToken {
 	return predicate.PersonalAccessToken(func(s *sql.Selector) {
@@ -364,103 +412,6 @@ func TokenContainsFold(v string) predicate.PersonalAccessToken {
 	})
 }
 
-// AbilitiesEQ applies the EQ predicate on the "abilities" field.
-func AbilitiesEQ(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesNEQ applies the NEQ predicate on the "abilities" field.
-func AbilitiesNEQ(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesIn applies the In predicate on the "abilities" field.
-func AbilitiesIn(vs ...string) predicate.PersonalAccessToken {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldAbilities), v...))
-	})
-}
-
-// AbilitiesNotIn applies the NotIn predicate on the "abilities" field.
-func AbilitiesNotIn(vs ...string) predicate.PersonalAccessToken {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldAbilities), v...))
-	})
-}
-
-// AbilitiesGT applies the GT predicate on the "abilities" field.
-func AbilitiesGT(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesGTE applies the GTE predicate on the "abilities" field.
-func AbilitiesGTE(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesLT applies the LT predicate on the "abilities" field.
-func AbilitiesLT(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesLTE applies the LTE predicate on the "abilities" field.
-func AbilitiesLTE(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesContains applies the Contains predicate on the "abilities" field.
-func AbilitiesContains(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesHasPrefix applies the HasPrefix predicate on the "abilities" field.
-func AbilitiesHasPrefix(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesHasSuffix applies the HasSuffix predicate on the "abilities" field.
-func AbilitiesHasSuffix(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldAbilities), v))
-	})
-}
-
 // AbilitiesIsNil applies the IsNil predicate on the "abilities" field.
 func AbilitiesIsNil() predicate.PersonalAccessToken {
 	return predicate.PersonalAccessToken(func(s *sql.Selector) {
@@ -472,20 +423,6 @@ func AbilitiesIsNil() predicate.PersonalAccessToken {
 func AbilitiesNotNil() predicate.PersonalAccessToken {
 	return predicate.PersonalAccessToken(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldAbilities)))
-	})
-}
-
-// AbilitiesEqualFold applies the EqualFold predicate on the "abilities" field.
-func AbilitiesEqualFold(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldAbilities), v))
-	})
-}
-
-// AbilitiesContainsFold applies the ContainsFold predicate on the "abilities" field.
-func AbilitiesContainsFold(v string) predicate.PersonalAccessToken {
-	return predicate.PersonalAccessToken(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldAbilities), v))
 	})
 }
 

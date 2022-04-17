@@ -12,7 +12,7 @@ func TestIsExistFile(t *testing.T) {
 
 // TestFindEnv tests the FindEnv function
 func TestFindEnv(t *testing.T) {
-	_, err := findEnv()
+	_, err := FindEnv()
 	if err != nil {
 		t.Errorf("failed finding env: %s", err)
 	}

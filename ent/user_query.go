@@ -383,7 +383,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			nodeids[nodes[i].ID] = nodes[i]
 			nodes[i].Edges.PersonalAccessTokens = []*PersonalAccessToken{}
 		}
-		query.withFKs = true
 		query.Where(predicate.PersonalAccessToken(func(s *sql.Selector) {
 			s.Where(sql.InValues(user.PersonalAccessTokensColumn, fks...))
 		}))
@@ -392,13 +391,10 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.user_personal_access_tokens
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "user_personal_access_tokens" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			fk := n.UserID
+			node, ok := nodeids[fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "user_personal_access_tokens" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "user_id" returned %v for node %v`, fk, n.ID)
 			}
 			node.Edges.PersonalAccessTokens = append(node.Edges.PersonalAccessTokens, n)
 		}

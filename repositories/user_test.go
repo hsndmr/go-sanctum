@@ -7,7 +7,7 @@ import (
 // TestCreateUser creates a user and asserts that the user is created.
 func TestCreateUser(t *testing.T) {
 	uf := &UserFactory{}
-	u := uf.Create()
+	u, _ := uf.Create()
 	if u.Name == "" {
 		t.Errorf("failed creating user")
 	}

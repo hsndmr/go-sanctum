@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/bxcodec/faker/v3"
+	"github.com/hsndmr/go-sanctum/app"
 	"github.com/hsndmr/go-sanctum/ent"
-	"github.com/hsndmr/go-sanctum/pkg/helpers"
 )
 
 type UserFaker struct {
@@ -16,18 +16,18 @@ type UserFaker struct {
 
 type UserFactory struct {}
 
-func (f *UserFactory) Create() (*ent.User) {
+func (f *UserFactory) Create() (*ent.User, error) {
 	item := UserFaker{}
 	err := faker.FakeData(&item)
-	helpers.CheckErr(err)
 	
+	if err != nil {
+		return nil, err
+	}
+
 	ur := &UserRepository{}
-	u, err := ur.Create(&CreateUserDto{
+	return ur.Create(&CreateUserDto{
 		Name: item.Name,
 		Email: item.Email,
 		Password: item.Password,
-	}, context.Background())
-	helpers.CheckErr(err)
-
-	return u
+	}, app.C.DBClient, context.Background())
 }

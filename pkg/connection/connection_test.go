@@ -6,8 +6,20 @@ import (
 	"github.com/hsndmr/go-sanctum/pkg/config"
 )
 
-func TestInit(t *testing.T) {
-	config.App.Init()
-	Connect()
-	defer Client.Close()
+func TestCreateClient(t *testing.T) {
+	config := &config.Config{
+		Database: &config.Database{
+			Connection: "sqlite3",
+			Host:       "localhost",
+			Name:       ":memory:",
+			User:       "root",
+			Password:   "",
+		},
+	}
+
+	_, err:= CreateClient(config)
+
+	if err !=nil {
+		t.Errorf("CreateClient error: %v", err)
+	}
 }

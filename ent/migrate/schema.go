@@ -13,12 +13,12 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString, Size: 64},
-		{Name: "abilities", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "abilities", Type: field.TypeJSON, Nullable: true},
 		{Name: "expiration_at", Type: field.TypeTime},
 		{Name: "last_used_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "user_personal_access_tokens", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt},
 	}
 	// PersonalAccessTokensTable holds the schema information for the "personal_access_tokens" table.
 	PersonalAccessTokensTable = &schema.Table{
@@ -30,7 +30,7 @@ var (
 				Symbol:     "personal_access_tokens_users_personal_access_tokens",
 				Columns:    []*schema.Column{PersonalAccessTokensColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
