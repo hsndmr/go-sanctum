@@ -1,8 +1,6 @@
 package app
 
 import (
-	"context"
-
 	"github.com/hsndmr/go-sanctum/pkg/config"
 	"github.com/hsndmr/go-sanctum/pkg/connection"
 )
@@ -13,16 +11,12 @@ type Container struct {
 	DBClient *connection.DBClient
 }
 
+// C is the global container
 var C *Container
 
 // Init initializes the configuration and database connection
 func Init() {
-	C = CreateContainer(context.Background())
-}
-
-func CreateContainer(ctx context.Context) *Container {
-	container := &Container{}
-	container.Config, _ = config.Init()
-	container.DBClient, _ = connection.CreateClient(container.Config)
-	return container
+	C := &Container{}
+	C.Config, _ = config.Init()
+	C.DBClient, _ = connection.CreateClient(C.Config)
 }
