@@ -6,6 +6,8 @@ import (
 	"github.com/hsndmr/go-sanctum/pkg/config"
 	"github.com/hsndmr/go-sanctum/pkg/connection"
 	cryptoservice "github.com/hsndmr/go-sanctum/pkg/crypto"
+	"github.com/hsndmr/go-sanctum/pkg/services"
+	"github.com/hsndmr/go-sanctum/pkg/token"
 	"github.com/hsndmr/go-sanctum/repositories"
 )
 
@@ -14,12 +16,10 @@ type Container struct {
 	Config *config.Config
 	DBClient *connection.DBClient
 	Repository *repositories.Repository
-	Service *Service
+	Service *services.Service
 }
 
-type Service struct {
-	Crypto *cryptoservice.Crypto
-}
+
 
 // C is the global container
 var C *Container
@@ -29,12 +29,13 @@ func Init() {
 	C = &Container{}
 	C.Config, _ = config.Init()
 	C.DBClient, _ = connection.CreateClient(C.Config)
-	C.Repository = repositories.CreateRepository(C.DBClient, context.Background())
-	C.Service = CreateService()
+		C.Service = CreateService()
+	C.Repository = repositories.CreateRepository(C.Service, C.DBClient, context.Background())
 }
 
-func CreateService() *Service {
-	return &Service{
+func CreateService() *services.Service {
+	return &services.Service{
 		Crypto: &cryptoservice.Crypto{},
+		Token: &token.Token{},
 	}
 }

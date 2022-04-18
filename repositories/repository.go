@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hsndmr/go-sanctum/pkg/connection"
+	"github.com/hsndmr/go-sanctum/pkg/services"
 )
 
 type BaseRepository struct {
@@ -18,7 +19,7 @@ type Repository struct {
 }
 
 
-func CreateRepository(db *connection.DBClient, ctx context.Context) *Repository {
+func CreateRepository(services *services.Service, db *connection.DBClient, ctx context.Context) *Repository {
 
 	bs := &BaseRepository{
 		db: db,
@@ -26,7 +27,13 @@ func CreateRepository(db *connection.DBClient, ctx context.Context) *Repository 
 	}
 
 	return &Repository{
-		User: &UserRepository{bs},
-		PersonalAccessToken: &PersonalAccessTokenRepository{bs},
+		User: &UserRepository{
+			BaseRepository: bs,
+			Crypto: services.Crypto,
+		},
+		PersonalAccessToken: &PersonalAccessTokenRepository{
+			BaseRepository: bs,
+			Token: services.Token,
+		},
 	}
 }
