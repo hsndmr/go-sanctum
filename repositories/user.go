@@ -3,7 +3,7 @@ package repositories
 import (
 	"github.com/hsndmr/go-sanctum/ent"
 	"github.com/hsndmr/go-sanctum/ent/user"
-	"github.com/hsndmr/go-sanctum/pkg/crypto"
+	cryptoservice "github.com/hsndmr/go-sanctum/pkg/crypto"
 )
 
 // dtos
@@ -14,6 +14,7 @@ type CreateUserDto struct {
 }
 type UserRepository struct {
 	*BaseRepository
+	Crypto *cryptoservice.Crypto
 }
 
 // Create creates a user and returns the user.
@@ -21,7 +22,7 @@ func (r *UserRepository) Create(dto *CreateUserDto) (*ent.User, error) {
 	return r.db.Client.User.
 						Create().
 						SetEmail(dto.Email).
-						SetPassword(crypto.HashPassword(dto.Password)).
+						SetPassword(r.Crypto.HashPassword(dto.Password)).
 						SetName(dto.Name).
 						Save(r.ctx)
 }

@@ -4,12 +4,16 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/hsndmr/go-sanctum/pkg/crypto"
+	cryptoservice "github.com/hsndmr/go-sanctum/pkg/crypto"
 	"github.com/hsndmr/go-sanctum/pkg/random"
 )
 
-// CreateToken creates a new token
-func  CreateToken() (*NewToken, error) {
+type Token struct {
+	Crypto *cryptoservice.Crypto
+}
+
+// Create creates a new token
+func (t *Token)  Create() (*NewToken, error) {
 	plainText, err := random.GenerateString(40)
 	if err != nil {
 		return nil, err
@@ -17,17 +21,17 @@ func  CreateToken() (*NewToken, error) {
 
 	return &NewToken{
 		plain: plainText,
-		Hash: crypto.SHA256(plainText),
+		Hash: t.Crypto.SHA256(plainText),
 	}, nil
 }
 
-// SplitToken returns the hash and ID
-func SplitToken(token string) (string, string, error) {
+// Split returns the hash and ID
+func (t *Token) Split(token string) (string, string, error) {
 	parts := strings.Split(token, "|")
 	if(len(parts) != 2) {
 		return "", "", errors.New("invalid token")
 	}
-	return parts[0], crypto.SHA256(parts[1]), nil
+	return parts[0], t.Crypto.SHA256(parts[1]), nil
 }
 
 // New Token

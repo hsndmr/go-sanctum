@@ -1,10 +1,17 @@
 package token
 
-import "testing"
+import (
+	"testing"
+
+	cryptoservice "github.com/hsndmr/go-sanctum/pkg/crypto"
+)
 
 // TestCreateToken tests the CreateToken function
 func TestCreateToken(t *testing.T) {
-	nt, err := CreateToken()
+	token := &Token{
+		Crypto: &cryptoservice.Crypto{},
+	}
+	nt, err := token.Create()
 	if err != nil {
 		t.Errorf("CreateToken() error: %s", err)
 	}
@@ -19,9 +26,12 @@ func TestCreateToken(t *testing.T) {
 }
 
 func TestSplitToken(t *testing.T) {
-	nt, _ := CreateToken()
+	token := &Token{
+		Crypto: &cryptoservice.Crypto{},
+	}
+	nt, _ := token.Create()
 
-	id, hash, err := SplitToken(nt.getPlainText("1"))
+	id, hash, err := token.Split(nt.getPlainText("1"))
 
 	if err != nil {
 		t.Errorf("SplitToken() error: %s", err)
