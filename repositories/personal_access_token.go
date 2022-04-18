@@ -9,10 +9,6 @@ import (
 	"github.com/hsndmr/go-sanctum/pkg/token"
 )
 
-type PersonalAccessTokenI interface{
-	Create(dto *CreatePersonalAccessTokenDto, db *connection.DBClient, ctx context.Context) (*ent.PersonalAccessToken, error)
-} 
-
 type CreatePersonalAccessTokenDto struct {
 	Name string
 	User *ent.User
@@ -21,7 +17,7 @@ type CreatePersonalAccessTokenDto struct {
 }
 
 type PersonalAccessTokenRepository struct {
-	PersonalAccessTokenI
+	*BaseRepository
 }
 // CreatePersonalAccessToken creates a new personal access token
 func (p *PersonalAccessTokenRepository) Create(dto *CreatePersonalAccessTokenDto, db *connection.DBClient, ctx context.Context) (*ent.PersonalAccessToken, error) {

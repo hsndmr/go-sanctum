@@ -1,4 +1,4 @@
-package repositories
+package repositorytest
 
 import (
 	"os"
@@ -10,7 +10,7 @@ import (
 
 func TestMain(m *testing.M) {
 	app.Init()
+	defer app.C.DBClient.Client.Close()
 	exitVal := m.Run()
-	app.C.DBClient.Client.Close()
 	os.Exit(exitVal)
 }

@@ -1,11 +1,10 @@
-package repositories
+package repositorytest
 
 import (
-	"context"
-
 	"github.com/bxcodec/faker/v3"
 	"github.com/hsndmr/go-sanctum/app"
 	"github.com/hsndmr/go-sanctum/ent"
+	"github.com/hsndmr/go-sanctum/repositories"
 )
 
 type UserFaker struct {
@@ -24,10 +23,12 @@ func (f *UserFactory) Create() (*ent.User, error) {
 		return nil, err
 	}
 
-	ur := &UserRepository{}
-	return ur.Create(&CreateUserDto{
+	ur := app.C.Repository.User
+
+	
+	return ur.Create(&repositories.CreateUserDto{
 		Name: item.Name,
 		Email: item.Email,
 		Password: item.Password,
-	}, app.C.DBClient, context.Background())
+	})
 }

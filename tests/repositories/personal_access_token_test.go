@@ -1,10 +1,11 @@
-package repositories
+package repositorytest
 
 import (
 	"context"
 	"testing"
 
 	"github.com/hsndmr/go-sanctum/app"
+	"github.com/hsndmr/go-sanctum/repositories"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,10 +15,10 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 
 	user, _ := uf.Create()
 
-	patr := &PersonalAccessTokenRepository{}
+	patr := app.C.Repository.PersonalAccessToken
 
 	t.Run("it should create personal access token", func(t *testing.T) {
-		token, err :=  patr.Create(&CreatePersonalAccessTokenDto{
+		token, err :=  patr.Create(&repositories.CreatePersonalAccessTokenDto{
 			User: user,
 		}, app.C.DBClient, context.Background())
 
@@ -33,7 +34,7 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 	t.Run("it should create personal access token with abilities", func(t *testing.T) {
 		abilities := []string{"user:update", "user:delete"}
 		
-		 token, _ := patr.Create(&CreatePersonalAccessTokenDto{
+		 token, _ := patr.Create(&repositories.CreatePersonalAccessTokenDto{
 			User: user,
 			Abilities: abilities,
 		}, app.C.DBClient, context.Background())
