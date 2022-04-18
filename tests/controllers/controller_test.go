@@ -22,6 +22,7 @@ func TestMain(m *testing.M) {
 	os.Exit(exitVal)
 }
 
+// jsonReaderFactory creates a json reader from struct
 func jsonReaderFactory(in interface{}) (io.Reader) {
 	buf := bytes.NewBuffer(nil)
 	enc := json.NewEncoder(buf)

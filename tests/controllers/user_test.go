@@ -11,9 +11,18 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/api/v1/user", interface{
-		"name": "test",
-	})
+
+	body := struct {
+    Name    string
+    Email   string
+    Password string
+	}{
+		Name:    "name",
+		Email:   "email@email.com",
+		Password: "secret",
+	}
+
+	req, _ := http.NewRequest("POST", "/api/v1/user", jsonReaderFactory(body))
 	router.ServeHTTP(w, req)
-	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, 201, w.Code)
 }

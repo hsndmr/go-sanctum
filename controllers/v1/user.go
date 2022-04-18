@@ -50,7 +50,7 @@ func (u *User) Create(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusCreated, gin.H{
 			"data": user,
 		})
 }
