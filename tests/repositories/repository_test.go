@@ -10,7 +10,7 @@ import (
 
 func TestMain(m *testing.M) {
 	app.Init()
-	defer app.C.DBClient.Client.Close()
+	defer app.C.DBClient.Client().Close()
 	exitVal := m.Run()
 	os.Exit(exitVal)
 }

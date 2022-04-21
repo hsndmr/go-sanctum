@@ -8,18 +8,17 @@ import (
 )
 
 type BaseRepository struct {
-	db  *connection.DBClient
+	db  connection.DBClientI
 	ctx context.Context
 }
 
-
 type Repository struct {
-	User                *UserRepository
-	PersonalAccessToken *PersonalAccessTokenRepository
+	User                UserRepositoryI
+	PersonalAccessToken PersonalAccessTokenRepositoryI
 }
 
 
-func CreateRepository(services *services.Service, db *connection.DBClient, ctx context.Context) *Repository {
+func CreateRepository(services *services.Service, db connection.DBClientI, ctx context.Context) *Repository {
 
 	bs := &BaseRepository{
 		db: db,

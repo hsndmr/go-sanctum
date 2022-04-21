@@ -7,5 +7,5 @@ import (
 
 type Service struct {
 	Crypto *cryptoservice.Crypto
-	Token *token.Token
+	Token token.TokenI
 }

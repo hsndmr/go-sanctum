@@ -8,8 +8,13 @@ import (
 	"github.com/hsndmr/go-sanctum/pkg/random"
 )
 
+type TokenI interface {
+	Create() (*NewToken, error)
+	Split(token string) (string, string, error)
+}
+
 type Token struct {
-	Crypto *cryptoservice.Crypto
+	Crypto cryptoservice.CryptoI
 }
 
 // Create creates a new token

@@ -16,7 +16,7 @@ var router *gin.Engine
 
 func TestMain(m *testing.M) {
 	app.Init()
-	defer app.C.DBClient.Client.Close()
+	defer app.C.DBClient.Client().Close()
 	router = routers.InitRouter()
 	exitVal := m.Run()
 	os.Exit(exitVal)

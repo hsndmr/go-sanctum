@@ -10,18 +10,22 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type DBClientI interface{
+	Client() *ent.Client
+	Close() error
+}
 type DBClient struct {
-	Client *ent.Client
+	client *ent.Client
 }
 
 // CreateScheme creates the scheme
 func (c *DBClient) CreateScheme(ctx context.Context) error {
-	return c.Client.Schema.Create(ctx)
+	return c.client.Schema.Create(ctx)
 }
 
 // Close closes the client
 func (c *DBClient) Close() error {
-	return c.Client.Close()
+	return c.client.Close()
 }
 
 // CreateClient creates the client to connect db
@@ -33,7 +37,7 @@ func CreateClient(config *config.Config) (*DBClient, error) {
 	}
 
 	dbClient := &DBClient{
-		Client: client,
+		client: client,
 	}
 
 	if (config.EnvType == "local") {
@@ -41,6 +45,11 @@ func CreateClient(config *config.Config) (*DBClient, error) {
 	}
 
 	return dbClient, nil
+}
+
+// Client returns the database client
+func (c *DBClient) Client() *ent.Client {
+	return c.client
 }
 
 // createConnectionString creates the connection string

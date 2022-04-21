@@ -14,7 +14,7 @@ import (
 
 type Container struct {
 	Config *config.Config
-	DBClient *connection.DBClient
+	DBClient connection.DBClientI
 	Repository *repositories.Repository
 	Service *services.Service
 }
@@ -29,13 +29,18 @@ func Init() {
 	C = &Container{}
 	C.Config, _ = config.Init()
 	C.DBClient, _ = connection.CreateClient(C.Config)
-		C.Service = CreateService()
+	C.Service = CreateService()
 	C.Repository = repositories.CreateRepository(C.Service, C.DBClient, context.Background())
 }
 
 func CreateService() *services.Service {
+
+	crypto := &cryptoservice.Crypto{}
+
 	return &services.Service{
-		Crypto: &cryptoservice.Crypto{},
-		Token: &token.Token{},
+		Crypto: crypto,
+		Token: &token.Token{
+			Crypto: crypto,
+		},
 	}
 }

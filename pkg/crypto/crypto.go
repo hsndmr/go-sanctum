@@ -6,6 +6,11 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 )
+type CryptoI interface {
+	SHA256(plainText string) string
+	HashPassword(password string) string
+	CheckPasswordHash(password, hash string) bool
+}
 
 type Crypto struct {}
 

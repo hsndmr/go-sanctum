@@ -12,6 +12,12 @@ type CreateUserDto struct {
 	Email string
 	Password string
 }
+
+type UserRepositoryI interface {
+	Create(dto *CreateUserDto) (*ent.User, error)
+	FindByEmail(email string) (*ent.User, error)
+}
+
 type UserRepository struct {
 	*BaseRepository
 	Crypto *cryptoservice.Crypto
@@ -19,7 +25,7 @@ type UserRepository struct {
 
 // Create creates a user and returns the user.
 func (r *UserRepository) Create(dto *CreateUserDto) (*ent.User, error) {
-	return r.db.Client.User.
+	return r.db.Client().User.
 						Create().
 						SetEmail(dto.Email).
 						SetPassword(r.Crypto.HashPassword(dto.Password)).
@@ -29,7 +35,7 @@ func (r *UserRepository) Create(dto *CreateUserDto) (*ent.User, error) {
 
 // FindByEmail finds a user by email and returns the user.
 func (r *UserRepository) FindByEmail(email string) (*ent.User, error) {
-	return r.db.Client.User.
+	return r.db.Client().User.
 						Query().
 						Where(user.Email(email)).
 						Only(r.ctx)

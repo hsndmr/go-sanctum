@@ -1,7 +1,6 @@
 package repositorytest
 
 import (
-	"context"
 	"testing"
 
 	"github.com/hsndmr/go-sanctum/app"
@@ -20,7 +19,7 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 	t.Run("it should create personal access token", func(t *testing.T) {
 		token, err :=  patr.Create(&repositories.CreatePersonalAccessTokenDto{
 			User: user,
-		}, app.C.DBClient, context.Background())
+		})
 
 		if err != nil {
 			t.Errorf("failed creating personal access token: %s", err.Error())
@@ -37,7 +36,7 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 		 token, _ := patr.Create(&repositories.CreatePersonalAccessTokenDto{
 			User: user,
 			Abilities: abilities,
-		}, app.C.DBClient, context.Background())
+		})
 		
 		assert.Equal(t, token.Abilities, abilities, "the abilities should be equal")
 	})
