@@ -1,10 +1,13 @@
 package repositories
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/hsndmr/go-sanctum/ent"
+	"github.com/hsndmr/go-sanctum/ent/personalaccesstoken"
+	"github.com/hsndmr/go-sanctum/ent/user"
 	"github.com/hsndmr/go-sanctum/pkg/token"
 )
 
@@ -17,6 +20,7 @@ type CreatePersonalAccessTokenDto struct {
 
 type PersonalAccessTokenRepositoryI interface {
 	Create(dto *CreatePersonalAccessTokenDto) (*ent.PersonalAccessToken, string, error)
+	Verify(token string) (*ent.User, error)
 }
 type PersonalAccessTokenRepository struct {
 	*BaseRepository
@@ -50,4 +54,41 @@ func (p *PersonalAccessTokenRepository) Create(dto *CreatePersonalAccessTokenDto
 	}
 
 	return personalAccessToken, tokenItem.GetPlainText(strconv.Itoa(personalAccessToken.ID)), nil
+}
+
+func (p *PersonalAccessTokenRepository) Verify(token string) (*ent.User, error) {
+	idStr, hash, err := p.Token.Split(token)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return nil, err
+	}
+	
+	personalAccessToken, err := p.db.Client().PersonalAccessToken.
+		Query().
+		Where(personalaccesstoken.ID(id)).
+		Where(personalaccesstoken.Token(hash)).
+		Only(p.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if personalAccessToken.ExpirationAt.Before(time.Now()) {
+		return nil, fmt.Errorf("token expired") 
+	}
+
+	user, err := p.db.Client().User.
+		Query().
+		Where(user.ID(personalAccessToken.UserID)).
+		Only(p.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

@@ -2,6 +2,7 @@ package repositorytest
 
 import (
 	"testing"
+	"time"
 
 	"github.com/hsndmr/go-sanctum/app"
 	"github.com/hsndmr/go-sanctum/repositories"
@@ -39,5 +40,39 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 		})
 		
 		assert.Equal(t, token.Abilities, abilities, "the abilities should be equal")
+	})
+}
+
+func TestVerifyToken(t *testing.T) {
+	uf := &UserFactory{}
+
+	user, _ := uf.Create()
+
+	patr := app.C.Repository.PersonalAccessToken
+
+	t.Run("it should verify token", func(t *testing.T) {
+		_, plainText, _ := patr.Create(&repositories.CreatePersonalAccessTokenDto{
+			User: user,
+		})
+
+		_, err := patr.Verify(plainText)
+
+		if err != nil {
+			t.Errorf("failed verifying token: %s", err.Error())
+		}
+	})
+
+	t.Run("it should throw expired token error", func(t *testing.T) {
+		time := time.Now().Add(-time.Hour*1)
+		_, plainText, _ := patr.Create(&repositories.CreatePersonalAccessTokenDto{
+			User: user,
+			ExpirationAt: &time,
+		})
+
+		_, err := patr.Verify(plainText)
+
+		if err == nil {
+			t.Errorf("not throw expired token error")
+		}
 	})
 }
