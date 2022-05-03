@@ -17,7 +17,7 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 	patr := app.C.Repository.PersonalAccessToken
 
 	t.Run("it should create personal access token", func(t *testing.T) {
-		token, err :=  patr.Create(&repositories.CreatePersonalAccessTokenDto{
+		token, _, err :=  patr.Create(&repositories.CreatePersonalAccessTokenDto{
 			User: user,
 		})
 
@@ -33,7 +33,7 @@ func TestCreatePersonalAccessToken(t *testing.T) {
 	t.Run("it should create personal access token with abilities", func(t *testing.T) {
 		abilities := []string{"user:update", "user:delete"}
 		
-		 token, _ := patr.Create(&repositories.CreatePersonalAccessTokenDto{
+		 token, _, _ := patr.Create(&repositories.CreatePersonalAccessTokenDto{
 			User: user,
 			Abilities: abilities,
 		})

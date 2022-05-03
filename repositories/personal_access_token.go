@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/hsndmr/go-sanctum/ent"
@@ -15,14 +16,14 @@ type CreatePersonalAccessTokenDto struct {
 }
 
 type PersonalAccessTokenRepositoryI interface {
-	Create(dto *CreatePersonalAccessTokenDto) (*ent.PersonalAccessToken, error)
+	Create(dto *CreatePersonalAccessTokenDto) (*ent.PersonalAccessToken, string, error)
 }
 type PersonalAccessTokenRepository struct {
 	*BaseRepository
 	Token token.TokenI
 }
 // CreatePersonalAccessToken creates a new personal access token
-func (p *PersonalAccessTokenRepository) Create(dto *CreatePersonalAccessTokenDto) (*ent.PersonalAccessToken, error) {
+func (p *PersonalAccessTokenRepository) Create(dto *CreatePersonalAccessTokenDto) (*ent.PersonalAccessToken, string, error) {
 	expirationAt := time.Now().Add(time.Hour * 24 * 7)
 	if(dto.ExpirationAt != nil) {
 		expirationAt = *dto.ExpirationAt
@@ -31,16 +32,22 @@ func (p *PersonalAccessTokenRepository) Create(dto *CreatePersonalAccessTokenDto
 	tokenItem, err := p.Token.Create()
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	
 	personalAccessTokenCreate := p.db.Client().PersonalAccessToken.Create()
 
-	return personalAccessTokenCreate.
-					SetName(dto.Name).
-					SetUser(dto.User).
-					SetToken(tokenItem.Hash).
-					SetExpirationAt(expirationAt).
-					SetAbilities(dto.Abilities).
-					Save(p.ctx)
+	personalAccessToken, err:= personalAccessTokenCreate.
+		SetName(dto.Name).
+		SetUser(dto.User).
+		SetToken(tokenItem.Hash).
+		SetExpirationAt(expirationAt).
+		SetAbilities(dto.Abilities).
+		Save(p.ctx)
+	
+	if err != nil {
+		return nil, "", err
+	}
+
+	return personalAccessToken, tokenItem.GetPlainText(strconv.Itoa(personalAccessToken.ID)), nil
 }

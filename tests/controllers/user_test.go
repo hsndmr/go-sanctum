@@ -21,8 +21,9 @@ func TestCreateUser(t *testing.T) {
 		Email:   "email@email.com",
 		Password: "secret",
 	}
-
+	
 	req, _ := http.NewRequest("POST", "/api/v1/user", jsonReaderFactory(body))
 	router.ServeHTTP(w, req)
+
 	assert.Equal(t, 201, w.Code)
 }

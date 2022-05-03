@@ -25,7 +25,7 @@ func (t *Token)  Create() (*NewToken, error) {
 	}
 
 	return &NewToken{
-		plain: plainText,
+		PlainText: plainText,
 		Hash: t.Crypto.SHA256(plainText),
 	}, nil
 }
@@ -41,14 +41,14 @@ func (t *Token) Split(token string) (string, string, error) {
 
 // New Token
 type NewToken struct {
-	plain string
+	PlainText string
 	Hash string
 }
 
 // GetPlainText returns the plain text
 // ModelID.PlainText
-func (nt *NewToken) getPlainText(ID string) string {
-	return ID+"|"+nt.plain
+func (nt *NewToken) GetPlainText(ID string) string {
+	return ID+"|"+nt.PlainText
 }
 
 

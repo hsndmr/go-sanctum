@@ -23,6 +23,7 @@ type CreateRequest struct {
 
 type User struct {}
 
+// Create creates a new user
 func (u *User) Create(c *gin.Context) {
 		var createRequest CreateRequest
 		if err := c.ShouldBindJSON(&createRequest); err != nil {
@@ -50,7 +51,22 @@ func (u *User) Create(c *gin.Context) {
 			return
 		}
 
+		personalAccessTokenRepository := app.C.Repository.PersonalAccessToken
+
+		_, token, err := personalAccessTokenRepository.Create(&repositories.CreatePersonalAccessTokenDto{
+			Name: "Personal Access Token",
+			User: user,
+		})
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{})
+			return
+		}
+
 		c.JSON(http.StatusCreated, gin.H{
-			"data": user,
+			"data": gin.H{
+				"user": user,
+				"token": token,
+			},
 		})
 }
