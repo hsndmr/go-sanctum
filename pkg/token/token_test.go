@@ -20,7 +20,7 @@ func TestCreateToken(t *testing.T) {
 		t.Errorf("CreateToken() error: invalid hash length")
 	}
 
-	if len(nt.getPlainText("1")) != 42 {
+	if len(nt.GetPlainText("1")) != 42 {
 		t.Errorf("CreateToken() error: invalid plain text length")
 	}
 }
@@ -31,7 +31,7 @@ func TestSplitToken(t *testing.T) {
 	}
 	nt, _ := token.Create()
 
-	id, hash, err := token.Split(nt.getPlainText("1"))
+	id, hash, err := token.Split(nt.GetPlainText("1"))
 
 	if err != nil {
 		t.Errorf("SplitToken() error: %s", err)
