@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 	"time"
 
@@ -78,7 +78,7 @@ func (p *PersonalAccessTokenRepository) Verify(token string) (*ent.User, error) 
 	}
 
 	if personalAccessToken.ExpirationAt.Before(time.Now()) {
-		return nil, fmt.Errorf("token expired") 
+		return nil, errors.New("token expired") 
 	}
 
 	user, err := p.db.Client().User.
