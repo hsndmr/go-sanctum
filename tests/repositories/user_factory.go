@@ -10,7 +10,6 @@ import (
 type UserFaker struct {
 	Name string `faker:"name"`
 	Email string `faker:"email"`
-	Password string `faker:"password"`
 }
 
 type UserFactory struct {}
@@ -29,6 +28,6 @@ func (f *UserFactory) Create() (*ent.User, error) {
 	return ur.Create(&repositories.CreateUserDto{
 		Name: item.Name,
 		Email: item.Email,
-		Password: item.Password,
+		Password: "secret",
 	})
 }

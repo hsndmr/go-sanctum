@@ -12,11 +12,17 @@ import (
 func RegisterUserRoutes(r *gin.RouterGroup) {
 	user := &User{}
 	r.POST("/user", user.Create)
+	r.POST("/auth/login", user.Login)
 }
 
 // validations
 type CreateRequest struct {
 	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+type LoginRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
@@ -69,4 +75,40 @@ func (u *User) Create(c *gin.Context) {
 				"token": token,
 			},
 		})
+}
+
+func (u *User) Login(c *gin.Context) {
+	var loginRequest LoginRequest
+	if err := c.ShouldBindJSON(&loginRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	user, err := app.C.Repository.User.FindByEmail(loginRequest.Email)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "email or password is not correct"})
+		return
+	}
+
+	if !app.C.Service.Crypto.CheckPasswordHash(loginRequest.Password, user.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "email or password is not correct"})
+		return
+	}
+
+	_, token, err := app.C.Repository.PersonalAccessToken.Create(&repositories.CreatePersonalAccessTokenDto{
+		User: user,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"user": user,
+			"token": token,
+		},
+	})
 }
