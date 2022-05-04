@@ -11,6 +11,8 @@ import (
 type Config struct {
 	Database *Database
 	EnvType string
+	Port string
+	Debug bool
 }
 
 
@@ -31,6 +33,10 @@ func Init() (*Config, error) {
 	config.Database = databaseSetting()
 
 	config.EnvType = os.Getenv("APP_ENV")
+
+	config.Port = os.Getenv("APP_PORT")
+
+	config.Debug = os.Getenv("APP_DEBUG") == "true"
 
 	return config, nil
 }
