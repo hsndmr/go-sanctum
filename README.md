@@ -1,3 +1,5 @@
+## Go Sanctum
+Go Sanctum offers a simple-to-use authentication system like Laravel Sanctum.
 ## Installation
  Clone the repository
 ````
