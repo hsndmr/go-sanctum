@@ -54,7 +54,7 @@ func (c *DBClient) Client() *ent.Client {
 
 // createConnectionString creates the connection string
 func createConnectionString(config *config.Config) string { 
-	if(config.Database.Connection == "sqlite3") {
+	if(config.Database.Connection == "memory") {
 		return "file:ent?mode=memory&cache=shared&_fk=1"
 	}
 
