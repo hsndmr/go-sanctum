@@ -9,8 +9,16 @@ import (
 	"github.com/hsndmr/go-sanctum/ent"
 	"github.com/hsndmr/go-sanctum/repositories"
 )
+type CreateRequest struct {
+	Name     string `json:"name" binding:"required" example:"name"`
+	Email    string `json:"email" binding:"required,email" example:"email@email.com"`
+	Password string `json:"password" binding:"required" example:"secret"`
+}
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email" example:"email@email.com"`
+	Password string `json:"password" binding:"required" example:"secret"`
+}
 
-// RegisterUserRoutes registers the user routes
 func RegisterUserRoutes(r *gin.RouterGroup) {
 	user := &User{}
 	r.POST("/user", user.Create)
@@ -18,21 +26,18 @@ func RegisterUserRoutes(r *gin.RouterGroup) {
 	r.GET("/user", middleware.Sanctum(), user.GetUser)
 }
 
-// validations
-type CreateRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
 type User struct {}
 
-// Create creates a new user
+// Create User
+// @Summary      This endpoint creates a new user
+// @Description  This endpoint creates a new user
+// @Accept       json
+// @Produce      json
+// @Param        message  body      controllerv1.CreateRequest  true  "User Info"
+// @Success      201      {object}   swagger.ResponseCreatedUser         "success"
+// @Failure      400 			{object}	 swagger.ResponseError				"bad request"
+// @Failure      500 			{object}	 swagger.ResponseError				"error"
+// @Router       /user [post]
 func (u *User) Create(c *gin.Context) {
 		var createRequest CreateRequest
 		if err := c.ShouldBindJSON(&createRequest); err != nil {
@@ -80,6 +85,16 @@ func (u *User) Create(c *gin.Context) {
 		})
 }
 
+// Login User
+// @Summary      This endpoint login a user with email and password
+// @Description  This endpoint login a user with email and password
+// @Accept       json
+// @Produce      json
+// @Param        message  body      controllerv1.LoginRequest  true  "User Info"
+// @Success      201      {object}   swagger.ResponseCreatedUser         "success"
+// @Failure      400 			{object}	 swagger.ResponseError				"bad request"
+// @Failure      500 			{object}	 swagger.ResponseError				"error"
+// @Router       /auth/login [post]
 func (u *User) Login(c *gin.Context) {
 	var loginRequest LoginRequest
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
@@ -116,6 +131,16 @@ func (u *User) Login(c *gin.Context) {
 	})
 }
 
+// Get User
+// @Summary      This endpoint gets a user with its token
+// @Description  This endpoint gets a user with its token
+// @Accept       json
+// @Produce      json
+// @Param        Authorization  header    string  true  "Authentication Bearer header"
+// @Success      200      {object}   swagger.ResponseGetUser         "success"
+// @Failure      401 			{object}	 swagger.ResponseError				"bad request"
+// @Failure      500 			{object}	 swagger.ResponseError				"error"
+// @Router       /user [get]
 func (u *User) GetUser(c *gin.Context) {
 	user := c.MustGet("user").(*ent.User)
 	c.JSON(http.StatusOK, gin.H{

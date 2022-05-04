@@ -1,0 +1,157 @@
+basePath: /api/v1
+definitions:
+  controllerv1.CreateRequest:
+    properties:
+      email:
+        example: email@email.com
+        type: string
+      name:
+        example: name
+        type: string
+      password:
+        example: secret
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  controllerv1.LoginRequest:
+    properties:
+      email:
+        example: email@email.com
+        type: string
+      password:
+        example: secret
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  swagger.ResponseCreatedUser:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.createdUser'
+    type: object
+  swagger.ResponseError:
+    properties:
+      message:
+        example: message
+        type: string
+    type: object
+  swagger.ResponseGetUser:
+    properties:
+      data:
+        $ref: '#/definitions/swagger.user'
+    type: object
+  swagger.createdUser:
+    properties:
+      token:
+        example: 1|V96CSH7oe3Pjr174sL4s24rCcnjZhWWw0IBUUjeh
+        type: string
+      user:
+        $ref: '#/definitions/swagger.user'
+    type: object
+  swagger.user:
+    properties:
+      email:
+        example: email@email.com
+        type: string
+      id:
+        example: "1"
+        type: string
+      name:
+        example: name
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: Go Sanctum offers a simple-to-use authentication system like Laravel
+    Sanctum.
+  title: Go Sanctum
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint login a user with email and password
+      parameters:
+      - description: User Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/controllerv1.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success
+          schema:
+            $ref: '#/definitions/swagger.ResponseCreatedUser'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/swagger.ResponseError'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/swagger.ResponseError'
+      summary: This endpoint login a user with email and password
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: This endpoint gets a user with its token
+      parameters:
+      - description: Authentication Bearer header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/swagger.ResponseGetUser'
+        "401":
+          description: bad request
+          schema:
+            $ref: '#/definitions/swagger.ResponseError'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/swagger.ResponseError'
+      summary: This endpoint gets a user with its token
+    post:
+      consumes:
+      - application/json
+      description: This endpoint creates a new user
+      parameters:
+      - description: User Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/controllerv1.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success
+          schema:
+            $ref: '#/definitions/swagger.ResponseCreatedUser'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/swagger.ResponseError'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/swagger.ResponseError'
+      summary: This endpoint creates a new user
+swagger: "2.0"

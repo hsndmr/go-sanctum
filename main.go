@@ -8,7 +8,11 @@ import (
 	"github.com/hsndmr/go-sanctum/routers"
 )
 
-
+// @title           Go Sanctum
+// @version         1.0
+// @description     Go Sanctum offers a simple-to-use authentication system like Laravel Sanctum.
+// @host      localhost:3000
+// @BasePath  /api/v1
 func main() {
 
 	app.Init()

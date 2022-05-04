@@ -12,3 +12,7 @@ Run the go-sanctum docker image
 ````
 docker run -p 3000:3000 --name go-sanctum go-sanctum
 ````
+Open swagger
+````
+http://localhost:3000/swagger/index.html
+````
