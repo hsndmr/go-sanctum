@@ -25,14 +25,17 @@ func CreateRepository(services *services.Service, db connection.DBClientI, ctx c
 		ctx: ctx,
 	}
 
+	ur := &UserRepository{
+		BaseRepository: bs,
+		Crypto: services.Crypto,
+	}
+
 	return &Repository{
-		User: &UserRepository{
-			BaseRepository: bs,
-			Crypto: services.Crypto,
-		},
+		User: ur,
 		PersonalAccessToken: &PersonalAccessTokenRepository{
 			BaseRepository: bs,
 			Token: services.Token,
+			UserRepository: ur,
 		},
 	}
 }

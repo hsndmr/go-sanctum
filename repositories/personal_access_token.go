@@ -7,7 +7,6 @@ import (
 
 	"github.com/hsndmr/go-sanctum/ent"
 	"github.com/hsndmr/go-sanctum/ent/personalaccesstoken"
-	"github.com/hsndmr/go-sanctum/ent/user"
 	"github.com/hsndmr/go-sanctum/pkg/token"
 )
 
@@ -25,6 +24,7 @@ type PersonalAccessTokenRepositoryI interface {
 type PersonalAccessTokenRepository struct {
 	*BaseRepository
 	Token token.TokenI
+	UserRepository UserRepositoryI
 }
 // CreatePersonalAccessToken creates a new personal access token
 func (p *PersonalAccessTokenRepository) Create(dto *CreatePersonalAccessTokenDto) (*ent.PersonalAccessToken, string, error) {
@@ -81,10 +81,7 @@ func (p *PersonalAccessTokenRepository) Verify(token string) (*ent.User, error) 
 		return nil, errors.New("token expired") 
 	}
 
-	user, err := p.db.Client().User.
-		Query().
-		Where(user.ID(personalAccessToken.UserID)).
-		Only(p.ctx)
+	user, err := p.UserRepository.FindByID(personalAccessToken.UserID)
 
 	if err != nil {
 		return nil, err
