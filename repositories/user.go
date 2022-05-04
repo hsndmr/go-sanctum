@@ -17,6 +17,7 @@ type UserRepositoryI interface {
 	Create(dto *CreateUserDto) (*ent.User, error)
 	FindByEmail(email string) (*ent.User, error)
 	FindByID(id int) (*ent.User, error)
+	ToInterfaceForJson(u *ent.User) interface{}
 }
 
 type UserRepository struct {
@@ -48,4 +49,16 @@ func (r *UserRepository) FindByID(id int) (*ent.User, error) {
 						Query().
 						Where(user.ID(id)).
 						Only(r.ctx)
+}
+
+func (r *UserRepository) ToInterfaceForJson(u *ent.User) interface{} {
+	return struct {
+		Id int `json:"id"`
+		Name string `json:"name"`
+		Email string `json:"email"`
+	} {
+		Id: u.ID,
+		Name: u.Name,
+		Email: u.Email,
+	}
 }

@@ -17,7 +17,6 @@ type Repository struct {
 	PersonalAccessToken PersonalAccessTokenRepositoryI
 }
 
-
 func CreateRepository(services *services.Service, db connection.DBClientI, ctx context.Context) *Repository {
 
 	bs := &BaseRepository{

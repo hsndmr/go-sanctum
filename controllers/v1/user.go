@@ -74,7 +74,7 @@ func (u *User) Create(c *gin.Context) {
 
 		c.JSON(http.StatusCreated, gin.H{
 			"data": gin.H{
-				"user": user,
+				"user": app.C.Repository.User.ToInterfaceForJson(user),
 				"token": token,
 			},
 		})
@@ -110,7 +110,7 @@ func (u *User) Login(c *gin.Context) {
 	
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
-			"user": user,
+			"user":  app.C.Repository.User.ToInterfaceForJson(user),
 			"token": token,
 		},
 	})
@@ -120,7 +120,7 @@ func (u *User) GetUser(c *gin.Context) {
 	user := c.MustGet("user").(*ent.User)
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
-			"user": user,
+			"user":  app.C.Repository.User.ToInterfaceForJson(user),
 		},
 	})
 }
