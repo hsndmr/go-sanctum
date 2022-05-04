@@ -16,6 +16,7 @@ type CreateUserDto struct {
 type UserRepositoryI interface {
 	Create(dto *CreateUserDto) (*ent.User, error)
 	FindByEmail(email string) (*ent.User, error)
+	FindByID(id int) (*ent.User, error)
 }
 
 type UserRepository struct {
@@ -38,5 +39,13 @@ func (r *UserRepository) FindByEmail(email string) (*ent.User, error) {
 	return r.db.Client().User.
 						Query().
 						Where(user.Email(email)).
+						Only(r.ctx)
+}
+
+// FindById finds a user by id and returns the user.
+func (r *UserRepository) FindByID(id int) (*ent.User, error) {
+	return r.db.Client().User.
+						Query().
+						Where(user.ID(id)).
 						Only(r.ctx)
 }
