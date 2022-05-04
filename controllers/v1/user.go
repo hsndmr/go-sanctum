@@ -5,6 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hsndmr/go-sanctum/app"
+	"github.com/hsndmr/go-sanctum/controllers/middleware"
+	"github.com/hsndmr/go-sanctum/ent"
 	"github.com/hsndmr/go-sanctum/repositories"
 )
 
@@ -13,6 +15,7 @@ func RegisterUserRoutes(r *gin.RouterGroup) {
 	user := &User{}
 	r.POST("/user", user.Create)
 	r.POST("/auth/login", user.Login)
+	r.GET("/user", middleware.Sanctum(), user.GetUser)
 }
 
 // validations
@@ -109,6 +112,15 @@ func (u *User) Login(c *gin.Context) {
 		"data": gin.H{
 			"user": user,
 			"token": token,
+		},
+	})
+}
+
+func (u *User) GetUser(c *gin.Context) {
+	user := c.MustGet("user").(*ent.User)
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"user": user,
 		},
 	})
 }

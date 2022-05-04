@@ -5,6 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hsndmr/go-sanctum/app"
+	"github.com/hsndmr/go-sanctum/repositories"
 	repositorytest "github.com/hsndmr/go-sanctum/tests/repositories"
 	"github.com/stretchr/testify/assert"
 )
@@ -65,4 +67,32 @@ func TestLoginUser(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
+}
+
+func TestGetUser(t *testing.T) {
+	uf := &repositorytest.UserFactory{}
+	u, _ := uf.Create()
+
+	_, token,  _ := app.C.Repository.PersonalAccessToken.Create(&repositories.CreatePersonalAccessTokenDto{
+		Name: "Personal Access Token",
+		User: u,
+	})
+	
+	t.Run("it should get user", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/api/v1/user", nil)
+		req.Header.Set("Authorization", "Bearer "+token)
+		router.ServeHTTP(w, req)
+		
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("it should throw authenticate error", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/api/v1/user", nil)
+		req.Header.Set("Authorization", "Bearer token")
+		router.ServeHTTP(w, req)
+		
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
 }
